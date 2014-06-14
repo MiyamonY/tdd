@@ -1,16 +1,15 @@
 # /usr/bin/env python
 # -*- coding:utf-8 -*-
 
-import unittest
+import nose.tools as assrt
 from evaluator import Evaluator
 
-class EvaluatorTests(unittest.TestCase):
+class TestEvaluator(object):
     '''tests for Evaluator class'''
 
+    @assrt.raises(Exception)
     def test_NullOrEmpytStringThrowsException(self):
         '''calling with empty string, throws eception'''
         sut = Evaluator()
-        self.assertRaises(Exception, sut.eval, "")
+        sut.eval("")
 
-if __name__ == '__main__':
-    unittest.main()
