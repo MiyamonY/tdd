@@ -8,5 +8,12 @@ class Evaluator(object):
         '''Evaluate string'''
         if len(s) == 0:
             raise Exception
+
+        if '+' in s:
+            parts = s.split('+')
+            return int(parts[0]) + int(parts[1])
+        elif '-' in s:
+            parts = s.split('-')
+            return int(parts[0]) - int(parts[1])
         else:
             return int(s)

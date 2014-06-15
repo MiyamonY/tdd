@@ -25,3 +25,11 @@ class TestEvaluator(object):
 
     def test_MultipleDiditNumberIsEvaluatedToItsIntegerValue(self):
         self.checkEvaluation("324", 324)
+
+    def test_AddingTwoNumbers(self):
+        self.checkEvaluation("1+2", 3)
+
+    def test_SubtractingTwoNumbers(self):
+        self.checkEvaluation("88-20", 68)
+
+    
