@@ -9,7 +9,8 @@ class Evaluator(object):
         if len(s) == 0:
             raise Exception
 
-        elements = list(self.parse(s))
+        parser = Parser()
+        elements = list(parser.parse(s))
 
         if len(elements) == 3:
             if elements[1].value == '+':
@@ -20,6 +21,7 @@ class Evaluator(object):
         else:
             return int(s)
 
+class Parser(object):
     def parse(self, s):
         operand = ""
         for curr_char in s:
