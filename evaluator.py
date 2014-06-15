@@ -1,6 +1,11 @@
 # /usr/bin/env python
 # -*- coding:utf-8 -*-
 
+'''
+Evaluate expression
+'''
+import abc
+
 class Evaluator(object):
     '''Evaluate class'''
 
@@ -13,16 +18,18 @@ class Evaluator(object):
         elements = list(parser.parse(s))
 
         if len(elements) == 3:
-            if elements[1].value == '+':
-                return int(elements[0].value) + int(elements[2].value)
-
-            if elements[1].value == '-':
-                return int(elements[0].value) - int(elements[2].value)
+            left = elements[0]
+            op = elements[1]
+            right = elements[2]
+            return op.compute(left, right)
         else:
             return int(s)
 
 class Parser(object):
+    ''' Parser class'''
     def parse(self, s):
+        '''parse string'''
+        operator_factory = OperatorFactory()
         operand = ""
         for curr_char in s:
             if curr_char.isdigit():
@@ -30,18 +37,53 @@ class Parser(object):
             else:
                 yield Operand(operand)
                 operand = ""
-                yield Operator(curr_char)
+                yield operator_factory.create(curr_char)
 
-        if not operand == "":
+        if operand != "":
             yield Operand(operand)
 
 class Element(object):
+    '''Operand, Operator's base class(using dynamic typing language,
+    this class is useless)'''
     pass
 
 class Operand(Element):
+    '''operand class'''
     def __init__(self, s):
-        self.value = s
+        self.value = int(s)
 
 class Operator(Element):
+    '''operator class'''
+    __metaclass__ = abc.ABCMeta
+
     def __init__(self, c):
-        self.value = c
+        self._value = c
+
+    @abc.abstractmethod
+    def compute(self, left, right):
+        return
+
+class OperatorFactory(object):
+    def create(self, op):
+        if op == '+':
+            return AddOperator()
+        elif op == '-':
+            return SubOperator()
+        else:
+            raise Exception()
+
+class AddOperator(Operator):
+    def __init__(self):
+        super(AddOperator, self).__init__('+')
+
+    def compute(self, left, right):
+        '''compute given value by add'''
+        return left.value + right.value
+
+class SubOperator(Operator):
+    def __init__(self):
+        super(SubOperator, self).__init__('-')
+
+    def compute(self, left, right):
+        '''compute given value by sub'''
+        return left.value - right.value
