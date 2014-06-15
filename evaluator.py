@@ -9,23 +9,37 @@ class Evaluator(object):
         if len(s) == 0:
             raise Exception
 
-        if '+' in s:
-            parts = s.split('+')
-            return int(parts[0]) + int(parts[1])
-        elif '-' in s:
-            parts = s.split('-')
-            return int(parts[0]) - int(parts[1])
+        elements = list(self.parse(s))
+
+        if len(elements) == 3:
+            if elements[1].value == '+':
+                return int(elements[0].value) + int(elements[2].value)
+
+            if elements[1].value == '-':
+                return int(elements[0].value) - int(elements[2].value)
         else:
             return int(s)
 
     def parse(self, s):
-        return []
+        operand = ""
+        for curr_char in s:
+            if curr_char.isdigit():
+                operand += curr_char
+            else:
+                yield Operand(operand)
+                operand = ""
+                yield Operator(curr_char)
+
+        if not operand == "":
+            yield Operand(operand)
 
 class Element(object):
     pass
 
 class Operand(Element):
-    pass
+    def __init__(self, s):
+        self.value = s
 
 class Operator(Element):
-    pass
+    def __init__(self, c):
+        self.value = c

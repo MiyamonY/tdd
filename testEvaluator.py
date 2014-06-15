@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import nose.tools as assrt
-from evaluator import Evaluator
+from evaluator import Evaluator, Operand, Operator
 
 class TestEvaluator(object):
     '''tests for Evaluator class'''
@@ -40,4 +40,12 @@ class TestEvaluator(object):
         assrt.ok_(isinstance(result[1], Operator))
         assrt.ok_(isinstance(result[2], Operand))
 
+class OperandTests(object):
+    def test_ConstructorSetsValuePropertyCorrectly(self):
+        sut = Operand("123")
+        assrt.eq_("123", sut.value)
 
+class OperatorTests(object):
+    def test_ConstructorSetsValuePropertyCorrectly(self):
+        sut = Operator("+")
+        assrt.eq_("+", sut.value)
