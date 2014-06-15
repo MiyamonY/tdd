@@ -13,3 +13,17 @@ class TestEvaluator(object):
         sut = Evaluator()
         sut.eval("")
 
+    def test_OneDigitNumberIsEvaluatedToItsIntegerValue(self):
+        sut = Evaluator()
+        result = sut.eval("7")
+        assrt.eq_(result, 7)
+
+    def test_OneDigitNumberIsEvaluatedItsIntegerValue_SecondAttempt(self):
+        sut = Evaluator()
+        result = sut.eval("5")
+        assrt.eq_(result, 5)
+
+    def test_MultipleDiditNumberIsEvaluatedToItsIntegerValue(self):
+        sut = Evaluator()
+        result = sut.eval("324")
+        assrt.eq_(result, 324)

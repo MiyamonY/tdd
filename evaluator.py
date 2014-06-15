@@ -6,4 +6,7 @@ class Evaluator(object):
 
     def eval(self, s):
         '''Evaluate string'''
-        return 0
+        if len(s) == 0:
+            raise Exception
+        else:
+            return int(s)
