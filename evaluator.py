@@ -17,3 +17,15 @@ class Evaluator(object):
             return int(parts[0]) - int(parts[1])
         else:
             return int(s)
+
+    def parse(self, s):
+        return []
+
+class Element(object):
+    pass
+
+class Operand(Element):
+    pass
+
+class Operator(Element):
+    pass

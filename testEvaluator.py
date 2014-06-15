@@ -32,4 +32,12 @@ class TestEvaluator(object):
     def test_SubtractingTwoNumbers(self):
         self.checkEvaluation("88-20", 68)
 
-    
+    def test_ParseReturnsAdditionElements(self):
+        sut = Evaluator()
+        result = list(sut.parse("1+2"))
+        assrt.eq_(len(result), 3)
+        assrt.ok_(isinstance(result[0], Operand))
+        assrt.ok_(isinstance(result[1], Operator))
+        assrt.ok_(isinstance(result[2], Operand))
+
+
