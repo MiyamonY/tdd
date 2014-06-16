@@ -9,13 +9,15 @@ import abc
 class Evaluator(object):
     '''Evaluate class'''
 
+    def __init__(self, parser):
+        self.parser = parser
+
     def eval(self, s):
         '''Evaluate string'''
         if len(s) == 0:
             raise Exception
 
-        parser = Parser(OperatorFactory(), OperandFactory())
-        elements = list(parser.parse(s))
+        elements = list(self.parser.parse(s))
 
         if len(elements) == 3:
             left = elements[0]

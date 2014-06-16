@@ -1,13 +1,14 @@
 # /usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from evaluator import Evaluator
+from evaluator import Evaluator, Parser, OperatorFactory, OperandFactory
 import nose.tools as assrt
 
 class TestAcceptance(object):
 
     def checkEvaluation(self, s, expected):
-        sut = Evaluator()
+        parser = Parser(OperatorFactory(), OperandFactory())
+        sut = Evaluator(parser)
         result = sut.eval(s)
         assrt.eq_(result, expected)
         

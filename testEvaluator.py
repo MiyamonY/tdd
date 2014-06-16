@@ -11,11 +11,13 @@ class TestEvaluator(object):
     @assrt.raises(Exception)
     def test_NullOrEmpytStringThrowsException(self):
         '''calling with empty string, throws eception'''
-        sut = Evaluator()
+        parser = Parser(OperatorFactory(), OperandFactory())
+        sut = Evaluator(parser)
         sut.eval("")
 
     def checkEvaluation(self, s, expected):
-        sut = Evaluator()
+        parser = Parser(OperatorFactory(), OperandFactory())
+        sut = Evaluator(parser)
         assrt.eq_(sut.eval(s), expected)
 
     def test_OneDigitNumberIsEvaluatedToItsIntegerValue(self):
