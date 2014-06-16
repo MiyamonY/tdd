@@ -41,6 +41,9 @@ class TestEvaluator(object):
     def test_DividingTwoNumbers(self):
         self.checkEvaluation("12/3", 4)
 
+    def test_TwoOperations(self):
+        self.checkEvaluation("2*3-5", 1)
+
 class TestOprandFactory(object):
     def test_CreateReturnsOperand(self):
         sut = OperandFactory()
@@ -72,6 +75,17 @@ class TestParser(object):
         sut = Parser(OperatorFactory(), operand_factory)
         list(sut.parse("1"))    # yield doesn't return value, untill it is used
         assrt.eq_(operand_factory.create.call_count, 1)
+
+    def test_MultipleOperandAndOperatorsAreParsedCorrectly(self):
+        sut = Parser(OperatorFactory(), OperandFactory())
+        result = list(sut.parse("1+2*3-4"))
+        assrt.eq_(len(result), 7)
+        assrt.ok_(isinstance(result[0], Operand))
+        assrt.ok_(isinstance(result[1], Operator))
+        assrt.ok_(isinstance(result[2], Operand))
+        assrt.ok_(isinstance(result[3], Operator))
+        assrt.ok_(isinstance(result[4], Operand))
+        assrt.ok_(isinstance(result[5], Operator))
 
 class TestOperatorFactory(object):
     def setUp(self):

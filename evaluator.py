@@ -18,14 +18,26 @@ class Evaluator(object):
             raise Exception
 
         elements = list(self.parser.parse(s))
+        
+        while len(elements) > 1:
+            tuple_index = self.find_operation(elements)
+            new_element = self.compute(elements[tuple_index],
+                                       elements[tuple_index+1],
+                                       elements[tuple_index+2])
+            elements = self.replace_operation(elements, tuple_index, new_element)
+        return elements[0].value
 
-        if len(elements) == 3:
-            left = elements[0]
-            op = elements[1]
-            right = elements[2]
-            return op.compute(left, right)
-        else:
-            return int(s)
+    def find_operation(self, elements):
+        for i, x in enumerate(elements):
+            if isinstance(x, Operator):
+                return i -1
+        return 0
+
+    def compute(self, loperand, op, roperand):
+        return Operand(op.compute(loperand, roperand))
+
+    def replace_operation(self, elements, index, operand):
+        return elements[:index] + [operand] + elements[index+3:]
 
 class Parser(object):
     ''' Parser class'''
