@@ -51,7 +51,7 @@ class Operand(Element):
     '''operand class'''
     def __init__(self, s):
         self.value = int(s)
-    
+
 class Operator(Element):
     '''operator class'''
     __metaclass__ = abc.ABCMeta
@@ -71,6 +71,8 @@ class OperatorFactory(object):
             return SubOperator()
         elif op == '*':
             return MulOperator()
+        elif op == '/':
+            return DivOperator()
         else:
             raise Exception("Unknown operator [{0}]".format(op))
 
@@ -97,3 +99,11 @@ class MulOperator(Operator):
     def compute(self, left, right):
         '''comptue given value by multi'''
         return left.value * right.value
+
+class DivOperator(Operator):
+    def __init__(self):
+        super(DivOperator, self).__init__('/')
+
+    def compute(self, left, right):
+        return left.value / right.value
+

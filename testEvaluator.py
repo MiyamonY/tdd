@@ -34,7 +34,10 @@ class TestEvaluator(object):
 
     def test_MultiplyingTwoNumbers(self):
         self.checkEvaluation("12*3", 36)
-        
+
+    def test_DividingTwoNumbers(self):
+        self.checkEvaluation("12/3", 4)
+
 class TestOperand(object):
     def test_ConstructorSetsValuePropertyCorrectly(self):
         sut = Operand("123")
@@ -66,6 +69,9 @@ class TestOperatorFactory(object):
     def test_MulSignReturnsMulOperator(self):
         self.check('*', MulOperator)
 
+    def test_DivSignReturnsDivOperator(self):
+        self.check('/', DivOperator)
+
     @assrt.raises(Exception)
     def test_UnknownSignThrowsException(self):
         sut = OperatorFactory()
@@ -88,3 +94,9 @@ class TestMulOperator(object):
         sut = MulOperator()
         result = sut.compute(Operand("10"), Operand("25"))
         assrt.eq_(result, 250)
+
+class TestDivOperator(object):
+    def test_DivOperatorComputesCorrectValue(self):
+        sut = DivOperator()
+        result = sut.compute(Operand("20"), Operand("10"))
+        assrt.eq_(result, 2)
