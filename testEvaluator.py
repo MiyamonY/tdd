@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import nose.tools as assrt
+import mock
 from evaluator import *
 
 class TestEvaluator(object):
@@ -62,6 +63,13 @@ class TestParser(object):
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
         assrt.ok_(isinstance(result[2], Operand))
+
+    def test_ParserCallsOperandFactoryCreate(self):
+        operand_factory = mock.Mock()
+        operand_factory.create.return_value = None # don't care return value
+        sut = Parser(OperatorFactory(), operand_factory)
+        list(sut.parse("1"))    # yield doesn't return value, untill it is used
+        assrt.eq_(operand_factory.create.call_count, 1)
 
 class TestOperatorFactory(object):
     def setUp(self):

@@ -38,19 +38,26 @@ class Parser(object):
             if curr_char.isdigit():
                 operand += curr_char
             else:
-                yield Operand(int(operand))
+                yield self.operand_factory.create(int(operand))
                 operand = ""
                 yield self.operator_factory.create(curr_char)
 
         if operand != "":
-            yield Operand(int(operand))
+            yield self.operand_factory.create(int(operand))
 
 class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,
     this class is useless)'''
     pass
 
-class OperandFactory(object):
+class IOperandFactory(object):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def create(self, value):
+        raise NotImplementedError()
+
+class OperandFactory(IOperandFactory):
     def create(self, value):
         return Operand(value)
 
