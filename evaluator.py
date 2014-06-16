@@ -14,7 +14,7 @@ class Evaluator(object):
         if len(s) == 0:
             raise Exception
 
-        parser = Parser()
+        parser = Parser(OperatorFactory(), OperandFactory())
         elements = list(parser.parse(s))
 
         if len(elements) == 3:
@@ -27,41 +27,37 @@ class Evaluator(object):
 
 class Parser(object):
     ''' Parser class'''
+    def __init__(self, operator_factory, operand_factory):
+        self.operator_factory = operator_factory
+        self.operand_factory = operand_factory
+
     def parse(self, s):
         '''parse string'''
-        operator_factory = OperatorFactory()
         operand = ""
         for curr_char in s:
             if curr_char.isdigit():
                 operand += curr_char
             else:
-                yield Operand(operand)
+                yield Operand(int(operand))
                 operand = ""
-                yield operator_factory.create(curr_char)
+                yield self.operator_factory.create(curr_char)
 
         if operand != "":
-            yield Operand(operand)
+            yield Operand(int(operand))
 
 class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,
     this class is useless)'''
     pass
 
+class OperandFactory(object):
+    def create(self, value):
+        return Operand(value)
+
 class Operand(Element):
     '''operand class'''
     def __init__(self, s):
-        self.value = int(s)
-
-class Operator(Element):
-    '''operator class'''
-    __metaclass__ = abc.ABCMeta
-
-    def __init__(self, c):
-        self._value = c
-
-    @abc.abstractmethod
-    def compute(self, left, right):
-        raise NotImplementedError()
+        self.value = s
 
 class OperatorFactory(object):
     def create(self, op):
@@ -75,6 +71,17 @@ class OperatorFactory(object):
             return DivOperator()
         else:
             raise Exception("Unknown operator [{0}]".format(op))
+
+class Operator(Element):
+    '''operator class'''
+    __metaclass__ = abc.ABCMeta
+
+    def __init__(self, c):
+        self._value = c
+
+    @abc.abstractmethod
+    def compute(self, left, right):
+        raise NotImplementedError()
 
 class AddOperator(Operator):
     def __init__(self):

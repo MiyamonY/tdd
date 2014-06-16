@@ -38,14 +38,25 @@ class TestEvaluator(object):
     def test_DividingTwoNumbers(self):
         self.checkEvaluation("12/3", 4)
 
+class TestOprandFactory(object):
+    def test_CreateReturnsOperand(self):
+        sut = OperandFactory()
+        result = sut.create(5)
+        assrt.ok_(isinstance(result, Operand))
+
+    def test_CreateReturnsOperandWithCorrectValue(self):
+        sut = OperandFactory()
+        result = sut.create(10)
+        assrt.eq_(result.value, 10)
+
 class TestOperand(object):
     def test_ConstructorSetsValuePropertyCorrectly(self):
-        sut = Operand("123")
-        assrt.eq_(123, sut.value)
+        sut = Operand(123)
+        assrt.eq_(sut.value, 123)
 
 class TestParser(object):
     def test_ParseReturnsAdditionElements(self):
-        sut = Parser()
+        sut = Parser(OperatorFactory(), OperandFactory())
         result = list(sut.parse("1+2"))
         assrt.eq_(len(result), 3)
         assrt.ok_(isinstance(result[0], Operand))
@@ -80,23 +91,23 @@ class TestOperatorFactory(object):
 class TestAddOperator(object):
     def test_AddOperatorComputesCorrectValue(self):
         sut = AddOperator()
-        result = sut.compute(Operand("10"), Operand("20"))
+        result = sut.compute(Operand(10), Operand(20))
         assrt.eq_(result, 30)
 
 class TestSubOperator(object):
     def test_SubtractionOperatorComputesCorrectValue(self):
         sut = SubOperator()
-        result = sut.compute(Operand("20"), Operand("10"))
+        result = sut.compute(Operand(20), Operand(10))
         assrt.eq_(result, 10)
 
 class TestMulOperator(object):
     def test_MulOperatorComputesCorrectValue(self):
         sut = MulOperator()
-        result = sut.compute(Operand("10"), Operand("25"))
+        result = sut.compute(Operand(10), Operand(25))
         assrt.eq_(result, 250)
 
 class TestDivOperator(object):
     def test_DivOperatorComputesCorrectValue(self):
         sut = DivOperator()
-        result = sut.compute(Operand("20"), Operand("10"))
+        result = sut.compute(Operand(20), Operand(10))
         assrt.eq_(result, 2)
