@@ -51,7 +51,7 @@ class Operand(Element):
     '''operand class'''
     def __init__(self, s):
         self.value = int(s)
-
+    
 class Operator(Element):
     '''operator class'''
     __metaclass__ = abc.ABCMeta
@@ -61,7 +61,7 @@ class Operator(Element):
 
     @abc.abstractmethod
     def compute(self, left, right):
-        return
+        raise NotImplementedError()
 
 class OperatorFactory(object):
     def create(self, op):
@@ -69,8 +69,10 @@ class OperatorFactory(object):
             return AddOperator()
         elif op == '-':
             return SubOperator()
+        elif op == '*':
+            return MulOperator()
         else:
-            raise Exception()
+            raise Exception("Unknown operator [{0}]".format(op))
 
 class AddOperator(Operator):
     def __init__(self):
@@ -87,3 +89,11 @@ class SubOperator(Operator):
     def compute(self, left, right):
         '''compute given value by sub'''
         return left.value - right.value
+
+class MulOperator(Operator):
+    def __init__(self):
+        super(MulOperator, self).__init__('*')
+
+    def compute(self, left, right):
+        '''comptue given value by multi'''
+        return left.value * right.value

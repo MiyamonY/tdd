@@ -32,6 +32,9 @@ class TestEvaluator(object):
     def test_SubtractingTwoNumbers(self):
         self.checkEvaluation("88-20", 68)
 
+    def test_MultiplyingTwoNumbers(self):
+        self.checkEvaluation("12*3", 36)
+        
 class TestOperand(object):
     def test_ConstructorSetsValuePropertyCorrectly(self):
         sut = Operand("123")
@@ -47,15 +50,21 @@ class TestParser(object):
         assrt.ok_(isinstance(result[2], Operand))
 
 class TestOperatorFactory(object):
+    def setUp(self):
+        self.sut = OperatorFactory()
+
+    def check(self, op, ty):
+        result = self.sut.create(op)
+        assrt.ok_(isinstance(result, ty))
+
     def test_PlusSignReturnsAddOperator(self):
-        sut = OperatorFactory()
-        result = sut.create('+')
-        assrt.ok_(isinstance(result, AddOperator))
+        self.check('+', AddOperator)
 
     def test_MinusSignReturnsSubOperator(self):
-        sut = OperatorFactory()
-        result = sut.create('-')
-        assrt.ok_(isinstance(result, SubOperator))
+        self.check('-', SubOperator)
+
+    def test_MulSignReturnsMulOperator(self):
+        self.check('*', MulOperator)
 
     @assrt.raises(Exception)
     def test_UnknownSignThrowsException(self):
@@ -73,3 +82,9 @@ class TestSubOperator(object):
         sut = SubOperator()
         result = sut.compute(Operand("20"), Operand("10"))
         assrt.eq_(result, 10)
+
+class TestMulOperator(object):
+    def test_MulOperatorComputesCorrectValue(self):
+        sut = MulOperator()
+        result = sut.compute(Operand("10"), Operand("25"))
+        assrt.eq_(result, 250)
