@@ -44,6 +44,52 @@ class TestEvaluator(object):
     def test_TwoOperations(self):
         self.checkEvaluation("2*3-5", 1)
 
+class TestElementList(object):
+    def test_FindOperationReturnsFirstOperation(self):
+        loperand = Operand(0)
+        op = AddOperator()
+        roperand = Operand(0)
+        sut = ElementList([Operand(0), Operand(0),
+                           loperand, op, roperand])
+        result = sut.find_operation()
+        assrt.eq_(loperand, result.loperand)
+        assrt.eq_(op, result.op)
+        assrt.eq_(roperand, result.roperand)
+
+    def test_RelaceOperationWorks(self):
+        loperand = Operand(0)
+        op = AddOperator()
+        roperand = Operand(0)
+        sut = ElementList([loperand, op, roperand])
+        operation = Operation(loperand, op, roperand)
+        sut.replace_operation(operation, Operand(0))
+        result = sut.find_operation()
+        assrt.eq_(result, None)
+
+    def test_ReplaceOperationReplaceTheCorrectOne(self):
+        other_opd1 = Operand(0)
+        other_op = AddOperator()
+        other_opd2 = Operand(0)
+        loperand = Operand(0)
+        op = AddOperator()
+        roperand = Operand(0)
+        sut = ElementList([other_opd1, other_op, other_opd2,
+                           loperand, op, roperand])
+        operation = Operation(loperand, op, roperand)
+        sut.replace_operation(operation, Operand(0))
+        result = sut.find_operation()
+        assrt.eq_(other_opd1, result.loperand)
+        assrt.eq_(other_op, result.op)
+        assrt.eq_(other_opd2, result.roperand)
+
+    def test_FirstReturnsFirstElement(self):
+        loperand = Operand(0)
+        op = AddOperator()
+        roperand = Operand(0)
+        sut = ElementList([loperand, op, roperand])
+        result = sut.first
+        assrt.eq_(result, loperand)
+        
 class TestOprandFactory(object):
     def test_CreateReturnsOperand(self):
         sut = OperandFactory()

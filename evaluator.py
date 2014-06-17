@@ -17,30 +17,15 @@ class Evaluator(object):
         if len(s) == 0:
             raise Exception
 
-        elements = list(self.parser.parse(s))
-        
-        while len(elements) > 1:
-            tup = self.find_operation(elements)
-            new_element = self.compute(tup[1])
-            self.replace_operation(elements, tup[0], new_element)
-        return elements[0].value
+        elements = ElementList(list(self.parser.parse(s)))
+        operation = elements.find_operation()
 
-    def find_operation(self, elements): 
-        for i, x in enumerate(elements):
-            if isinstance(x, Operator):
-                return (i - 1, Operation(elements[i - 1],
-                                     elements[i],
-                                     elements[i + 1]))
-        return None
+        while operation != None:
+            new_element = operation.compute()
+            elements.replace_operation(operation, new_element)
+            operation = elements.find_operation()
 
-    def compute(self, op):
-        return Operand(op.op.compute(op.loperand, op.roperand))
-
-    def replace_operation(self, elements, index, operand):
-        del elements[index + 2]
-        del elements[index + 1]
-        del elements[index]
-        elements.insert(index, operand)
+        return elements.first.value
 
 class Parser(object):
     ''' Parser class'''
@@ -66,6 +51,30 @@ class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,
     this class is useless)'''
     pass
+
+class ElementList(object):
+    def __init__(self, elements):
+        self.elements = elements
+
+    def find_operation(self):
+        for i, e in enumerate(self.elements):
+            if isinstance(e, Operator):
+                return Operation(self.elements[i-1],
+                                 self.elements[i],
+                                 self.elements[i+1])
+        return None
+
+    def replace_operation(self, operation, operand):
+        index = self.elements.index(operation.loperand)
+        del self.elements[index+2]
+        del self.elements[index+1]
+        self.elements[index] = operand
+
+    def __getattr__(self, name):
+        if name == 'first':
+            return self.elements[0]
+        else:
+            raise AttributeError()
 
 class IOperandFactory(object):
     __metaclass__ = abc.ABCMeta
@@ -95,12 +104,6 @@ class OperatorFactory(object):
             return DivOperator()
         else:
             raise Exception("Unknown operator [{0}]".format(op))
-
-class Operation(object):
-    def __init__(self, loperand, op, roperand):
-        self.loperand = loperand
-        self.op = op
-        self.roperand = roperand
 
 class Operator(Element):
     '''operator class'''
@@ -144,3 +147,11 @@ class DivOperator(Operator):
     def compute(self, left, right):
         return left.value / right.value
 
+class Operation(object):
+    def __init__(self, loperand, op, roperand):
+        self.loperand = loperand
+        self.op = op
+        self.roperand = roperand
+
+    def compute(self):
+        return Operand(self.op.compute(self.loperand, self.roperand))
