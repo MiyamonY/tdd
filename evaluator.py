@@ -20,24 +20,27 @@ class Evaluator(object):
         elements = list(self.parser.parse(s))
         
         while len(elements) > 1:
-            tuple_index = self.find_operation(elements)
-            new_element = self.compute(elements[tuple_index],
-                                       elements[tuple_index+1],
-                                       elements[tuple_index+2])
-            elements = self.replace_operation(elements, tuple_index, new_element)
+            tup = self.find_operation(elements)
+            new_element = self.compute(tup[1])
+            self.replace_operation(elements, tup[0], new_element)
         return elements[0].value
 
-    def find_operation(self, elements):
+    def find_operation(self, elements): 
         for i, x in enumerate(elements):
             if isinstance(x, Operator):
-                return i -1
-        return 0
+                return (i - 1, Operation(elements[i - 1],
+                                     elements[i],
+                                     elements[i + 1]))
+        return None
 
-    def compute(self, loperand, op, roperand):
-        return Operand(op.compute(loperand, roperand))
+    def compute(self, op):
+        return Operand(op.op.compute(op.loperand, op.roperand))
 
     def replace_operation(self, elements, index, operand):
-        return elements[:index] + [operand] + elements[index+3:]
+        del elements[index + 2]
+        del elements[index + 1]
+        del elements[index]
+        elements.insert(index, operand)
 
 class Parser(object):
     ''' Parser class'''
@@ -92,6 +95,12 @@ class OperatorFactory(object):
             return DivOperator()
         else:
             raise Exception("Unknown operator [{0}]".format(op))
+
+class Operation(object):
+    def __init__(self, loperand, op, roperand):
+        self.loperand = loperand
+        self.op = op
+        self.roperand = roperand
 
 class Operator(Element):
     '''operator class'''
