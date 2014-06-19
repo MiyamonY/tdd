@@ -165,12 +165,12 @@ class TestOperand(object):
         assrt.eq_(sut.value, 123)
 
 class TestParser(object):    
-    def create_parser(self):
-        return Parser(OperatorFactory(), OperandFactory())
+    def parse(self, s):
+        parser = Parser(OperatorFactory(), OperandFactory())
+        return list(parser.parse(s))
         
     def test_ParseReturnsAdditionElements(self):
-        sut = self.create_parser()
-        result = list(sut.parse("1+2"))
+        result = self.parse("1+2")
         assrt.eq_(len(result), 3)
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
@@ -184,8 +184,7 @@ class TestParser(object):
         assrt.eq_(operand_factory.create.call_count, 1)
 
     def test_MultipleOperandAndOperatorsAreParsedCorrectly(self):
-        sut = self.create_parser()
-        result = list(sut.parse("1+2*3-4"))
+        result = self.parse("1+2*3-4")
         assrt.eq_(len(result), 7)
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
@@ -195,21 +194,18 @@ class TestParser(object):
         assrt.ok_(isinstance(result[5], Operator))
 
     def test_NegativeNumber(self):
-        sut = self.create_parser()
-        result = list(sut.parse("-3"))
+        result = self.parse("-3")
         assrt.eq_(len(result), 2)
         assrt.ok_(isinstance(result[0], SubOperator))
         assrt.eq_(result[1].value, 3)
 
     def test_NumberInParentheses(self):
-        sut = self.create_parser()
-        result = list(sut.parse("(3)"))
+        result = self.parse("(3)")
         assrt.eq_(len(result), 1)
         assrt.eq_(result[0].value, 3)
 
     def test_OperatorsInParenthesesGetAPrecedenceBoost(self):
-        sut = self.create_parser()
-        result = list(sut.parse("(1+2)"))
+        result = self.parse("(1+2)")
         assrt.eq_(len(result), 3)
         assrt.eq_(result[0].value, 1)
         assrt.eq_(result[1].precedence, 11)
