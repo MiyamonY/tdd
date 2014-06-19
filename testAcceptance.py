@@ -26,3 +26,7 @@ class TestAcceptance(object):
 
     def test_MultipleOperation(self):
         self.checkEvaluation("2+3*5-8/2", 13)
+
+    def test_ComplexExpression(self):
+        self.checkEvaluation("-2+3*(-5+8-9)/2", 11)
+

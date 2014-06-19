@@ -40,7 +40,8 @@ class Parser(object):
             if curr_char.isdigit():
                 operand += curr_char
             else:
-                yield self.operand_factory.create(int(operand))
+                if operand != "":
+                    yield self.operand_factory.create(int(operand))
                 operand = ""
                 yield self.operator_factory.create(curr_char)
 
@@ -68,15 +69,22 @@ class ElementList(object):
 
         index = self.elements.index(first_op)
 
-        return Operation(self.elements[index-1],
+        return Operation(self.get_operand(index-1),
                          self.elements[index],
-                         self.elements[index+1])
+                         self.get_operand(index+1))
+
+    def get_operand(self, index):
+        return \
+            Operand(0) if index < 0 or index >= len(self.elements) \
+                 else self.elements[index]
 
     def replace_operation(self, operation, operand):
-        index = self.elements.index(operation.loperand)
-        del self.elements[index+2]
-        del self.elements[index+1]
+        index = self.elements.index(operation.op)
+        if self.get_operand(index+1) == operation.roperand:
+            del self.elements[index+1]
         self.elements[index] = operand
+        if self.get_operand(index-1) == operation.loperand:
+            del self.elements[index-1]
 
     def __getattr__(self, name):
         if name == 'first':

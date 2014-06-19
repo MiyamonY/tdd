@@ -47,6 +47,10 @@ class TestEvaluator(object):
     def test_TwoOperationsRespectingPrecedence(self):
         self.checkEvaluation("2+3*5", 17)
 
+    def test_NegativeNumber(self):
+        self.checkEvaluation("-3", -3)
+
+
 class TestElementList(object):
     def test_FindOperationReturnsFirstOperation(self):
         loperand = Operand(0)
@@ -92,7 +96,7 @@ class TestElementList(object):
         sut = ElementList([loperand, op, roperand])
         result = sut.first
         assrt.eq_(result, loperand)
-        
+
     def test_FindOperationReturnsHighestPrecedence(self):
         loperand = Operand(0)
         op = MulOperator()
@@ -101,6 +105,15 @@ class TestElementList(object):
                            Operand(0), loperand, op, roperand])
         result = sut.find_operation()
         assrt.eq_(result.loperand, loperand)
+        assrt.eq_(result.op, op)
+        assrt.eq_(result.roperand, roperand)
+
+    def test_FindOperationCanHandleNegativeNumbers(self):
+        op = SubOperator()
+        roperand = Operand(1)
+        sut = ElementList([op, roperand])
+        result = sut.find_operation()
+        assrt.eq_(result.loperand.value, 0)
         assrt.eq_(result.op, op)
         assrt.eq_(result.roperand, roperand)
 
@@ -114,6 +127,15 @@ class TestOprandFactory(object):
         sut = OperandFactory()
         result = sut.create(10)
         assrt.eq_(result.value, 10)
+
+    def test_ReplaceOperationCanHandleNegativeNumbers(self):
+        op = SubOperator()
+        roperand = Operand(1)
+        sut = ElementList([op, roperand])
+        operation = sut.find_operation()
+        sut.replace_operation(operation, Operand(-1))
+        assrt.eq_(sut.first.value, -1)
+        assrt.eq_(sut.find_operation(), None)
 
 class TestOperand(object):
     def test_ConstructorSetsValuePropertyCorrectly(self):
@@ -146,6 +168,13 @@ class TestParser(object):
         assrt.ok_(isinstance(result[3], Operator))
         assrt.ok_(isinstance(result[4], Operand))
         assrt.ok_(isinstance(result[5], Operator))
+
+    def test_NegativeNumber(self):
+        sut = Parser(OperatorFactory(), OperandFactory())
+        result = list(sut.parse("-3"))
+        assrt.eq_(len(result),2)
+        assrt.ok_(isinstance(result[0], SubOperator))
+        assrt.eq_(result[1].value, 3)
 
 class TestOperatorFactory(object):
     def setUp(self):
