@@ -57,12 +57,20 @@ class ElementList(object):
         self.elements = elements
 
     def find_operation(self):
-        for i, e in enumerate(self.elements):
-            if isinstance(e, Operator):
-                return Operation(self.elements[i-1],
-                                 self.elements[i],
-                                 self.elements[i+1])
-        return None
+        operators = [x for x in self.elements if isinstance(x, Operator)]
+
+        if operators == []: return None
+
+        max_precedence = max([x.precedence for x in operators])
+
+        first_op = [x for x in operators
+                    if x.precedence == max_precedence][0]
+
+        index = self.elements.index(first_op)
+
+        return Operation(self.elements[index-1],
+                         self.elements[index],
+                         self.elements[index+1])
 
     def replace_operation(self, operation, operand):
         index = self.elements.index(operation.loperand)
@@ -111,6 +119,7 @@ class Operator(Element):
 
     def __init__(self, c):
         self._value = c
+        self.precedence = 0
 
     @abc.abstractmethod
     def compute(self, left, right):
@@ -119,6 +128,7 @@ class Operator(Element):
 class AddOperator(Operator):
     def __init__(self):
         super(AddOperator, self).__init__('+')
+        self.precedence = 1
 
     def compute(self, left, right):
         '''compute given value by add'''
@@ -127,6 +137,7 @@ class AddOperator(Operator):
 class SubOperator(Operator):
     def __init__(self):
         super(SubOperator, self).__init__('-')
+        self.precedence = 1
 
     def compute(self, left, right):
         '''compute given value by sub'''
@@ -135,6 +146,7 @@ class SubOperator(Operator):
 class MulOperator(Operator):
     def __init__(self):
         super(MulOperator, self).__init__('*')
+        self.precedence = 2
 
     def compute(self, left, right):
         '''comptue given value by multi'''
@@ -143,6 +155,7 @@ class MulOperator(Operator):
 class DivOperator(Operator):
     def __init__(self):
         super(DivOperator, self).__init__('/')
+        self.precedence = 2
 
     def compute(self, left, right):
         return left.value / right.value

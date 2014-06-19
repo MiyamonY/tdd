@@ -44,6 +44,9 @@ class TestEvaluator(object):
     def test_TwoOperations(self):
         self.checkEvaluation("2*3-5", 1)
 
+    def test_TwoOperationsRespectingPrecedence(self):
+        self.checkEvaluation("2+3*5", 17)
+
 class TestElementList(object):
     def test_FindOperationReturnsFirstOperation(self):
         loperand = Operand(0)
@@ -90,6 +93,17 @@ class TestElementList(object):
         result = sut.first
         assrt.eq_(result, loperand)
         
+    def test_FindOperationReturnsHighestPrecedence(self):
+        loperand = Operand(0)
+        op = MulOperator()
+        roperand = Operand(0)
+        sut = ElementList([Operand(0), AddOperator(),
+                           Operand(0), loperand, op, roperand])
+        result = sut.find_operation()
+        assrt.eq_(result.loperand, loperand)
+        assrt.eq_(result.op, op)
+        assrt.eq_(result.roperand, roperand)
+
 class TestOprandFactory(object):
     def test_CreateReturnsOperand(self):
         sut = OperandFactory()
@@ -157,6 +171,13 @@ class TestOperatorFactory(object):
     def test_UnknownSignThrowsException(self):
         sut = OperatorFactory()
         sut.create('x')
+
+class TestOperator(object):
+    def test_OperatorPrecedenceIsSetCorrect(self):
+        assrt.eq_(1, AddOperator().precedence)
+        assrt.eq_(1, SubOperator().precedence)
+        assrt.eq_(2, MulOperator().precedence)
+        assrt.eq_(2, DivOperator().precedence)
 
 class TestAddOperator(object):
     def test_AddOperatorComputesCorrectValue(self):
