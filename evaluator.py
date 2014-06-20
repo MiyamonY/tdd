@@ -37,15 +37,15 @@ class Parser(object):
         '''parse string'''
         operand = ""
         for curr_char in s:
-            if curr_char.isdigit():
+            if curr_char.isdigit() or curr_char == '.':
                 operand += curr_char
             else:
-                yield self.operand_factory.create(int(operand))
+                yield self.operand_factory.create(float(operand))
                 operand = ""
                 yield self.operator_factory.create(curr_char)
 
         if operand != "":
-            yield self.operand_factory.create(int(operand))
+            yield self.operand_factory.create(float(operand))
 
 class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,

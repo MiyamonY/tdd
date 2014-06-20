@@ -5,6 +5,9 @@ import nose.tools as assrt
 import mock
 from evaluator import *
 
+def eq_(result, expected, precision=0.001):
+    assrt.ok_(expected - precision <= result <= expected + precision)
+
 class TestEvaluator(object):
     '''tests for Evaluator class'''
 
@@ -15,10 +18,10 @@ class TestEvaluator(object):
         sut = Evaluator(parser)
         sut.eval("")
 
-    def checkEvaluation(self, s, expected):
+    def checkEvaluation(self, s, expected, precision = 0.0001):
         parser = Parser(OperatorFactory(), OperandFactory())
         sut = Evaluator(parser)
-        assrt.eq_(sut.eval(s), expected)
+        eq_(sut.eval(s), expected, precision)
 
     def test_OneDigitNumberIsEvaluatedToItsIntegerValue(self):
         self.checkEvaluation("7", 7)
@@ -46,6 +49,9 @@ class TestEvaluator(object):
 
     def test_TwoOperationsRespectingPrecedence(self):
         self.checkEvaluation("2+3*5", 17)
+
+    def test_FloatingPointNumber(self):
+        self.checkEvaluation("1.5", 1.5, 0.01)
 
 class TestElementList(object):
     def test_FindOperationReturnsFirstOperation(self):
@@ -92,7 +98,7 @@ class TestElementList(object):
         sut = ElementList([loperand, op, roperand])
         result = sut.first
         assrt.eq_(result, loperand)
-        
+
     def test_FindOperationReturnsHighestPrecedence(self):
         loperand = Operand(0)
         op = MulOperator()
@@ -105,25 +111,34 @@ class TestElementList(object):
         assrt.eq_(result.roperand, roperand)
 
 class TestOprandFactory(object):
-    def test_CreateReturnsOperand(self):
+    def get_operand(self, value):
         sut = OperandFactory()
-        result = sut.create(5)
+        return sut.create(value)
+
+    def test_CreateReturnsOperand(self):
+        result = self.get_operand(5)
         assrt.ok_(isinstance(result, Operand))
 
     def test_CreateReturnsOperandWithCorrectValue(self):
-        sut = OperandFactory()
-        result = sut.create(10)
-        assrt.eq_(result.value, 10)
+        result = self.get_operand(10)
+        eq_(result.value, 10)
+
+    def test_CreateReturnsOperandWithCorrectFloatingPoint(self):
+        result = self.get_operand(5.73)
+        eq_(result.value, 5.73, 0.01)
 
 class TestOperand(object):
     def test_ConstructorSetsValuePropertyCorrectly(self):
         sut = Operand(123)
-        assrt.eq_(sut.value, 123)
+        eq_(sut.value, 123)
 
 class TestParser(object):
-    def test_ParseReturnsAdditionElements(self):
+    def parse(self, s):
         sut = Parser(OperatorFactory(), OperandFactory())
-        result = list(sut.parse("1+2"))
+        return list(sut.parse(s))
+        
+    def test_ParseReturnsAdditionElements(self):
+        result = self.parse(("1+2"))
         assrt.eq_(len(result), 3)
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
@@ -137,8 +152,7 @@ class TestParser(object):
         assrt.eq_(operand_factory.create.call_count, 1)
 
     def test_MultipleOperandAndOperatorsAreParsedCorrectly(self):
-        sut = Parser(OperatorFactory(), OperandFactory())
-        result = list(sut.parse("1+2*3-4"))
+        result = self.parse("1+2*3-4")
         assrt.eq_(len(result), 7)
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
@@ -146,6 +160,11 @@ class TestParser(object):
         assrt.ok_(isinstance(result[3], Operator))
         assrt.ok_(isinstance(result[4], Operand))
         assrt.ok_(isinstance(result[5], Operator))
+
+    def test_FloatingPointNumber(self):
+        result = self.parse("1.5")
+        assrt.eq_(len(result), 1)
+        eq_(result[0].value, 1.5, 0.01)
 
 class TestOperatorFactory(object):
     def setUp(self):
@@ -174,31 +193,31 @@ class TestOperatorFactory(object):
 
 class TestOperator(object):
     def test_OperatorPrecedenceIsSetCorrect(self):
-        assrt.eq_(1, AddOperator().precedence)
-        assrt.eq_(1, SubOperator().precedence)
-        assrt.eq_(2, MulOperator().precedence)
-        assrt.eq_(2, DivOperator().precedence)
+        assrt.eq_(AddOperator().precedence, 1)
+        assrt.eq_(SubOperator().precedence, 1)
+        assrt.eq_(MulOperator().precedence, 2)
+        assrt.eq_(DivOperator().precedence, 2)
 
 class TestAddOperator(object):
     def test_AddOperatorComputesCorrectValue(self):
         sut = AddOperator()
         result = sut.compute(Operand(10), Operand(20))
-        assrt.eq_(result, 30)
+        eq_(result, 30)
 
 class TestSubOperator(object):
     def test_SubtractionOperatorComputesCorrectValue(self):
         sut = SubOperator()
         result = sut.compute(Operand(20), Operand(10))
-        assrt.eq_(result, 10)
+        eq_(result, 10)
 
 class TestMulOperator(object):
     def test_MulOperatorComputesCorrectValue(self):
         sut = MulOperator()
         result = sut.compute(Operand(10), Operand(25))
-        assrt.eq_(result, 250)
+        eq_(result, 250)
 
 class TestDivOperator(object):
     def test_DivOperatorComputesCorrectValue(self):
         sut = DivOperator()
         result = sut.compute(Operand(20), Operand(10))
-        assrt.eq_(result, 2)
+        eq_(result, 2)
