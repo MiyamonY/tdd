@@ -240,6 +240,9 @@ class TestParser(object):
     def test_DoubleDecimalPoint(self):
         self.parse("1.5.7")
 
+    def test_ExpressioWithSpaces(self):
+        result = self.parse("1 + 2")
+        assrt.eq_(len(result), 3)
 
 class TestOperatorFactory(object):
     def setUp(self):

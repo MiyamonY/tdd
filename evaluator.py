@@ -40,6 +40,8 @@ class Parser(object):
 
         operand = ""
         for curr_char in s:
+            if curr_char.isspace(): continue
+
             if curr_char.isdigit() or curr_char == '.':
                 operand += curr_char
             else:
