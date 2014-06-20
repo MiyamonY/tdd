@@ -21,13 +21,8 @@ class TestEvaluator(object):
         sut = Evaluator(parser)
         sut.eval("")
 
-<<<<<<< HEAD
     def checkEvaluation(self, s, expected, precision = 0.0001):
-        parser = Parser(OperatorFactory(), OperandFactory())
-=======
-    def checkEvaluation(self, s, expected):
         parser = self.create_parser()
->>>>>>> chap5
         sut = Evaluator(parser)
         eq_(sut.eval(s), expected, precision)
 
@@ -58,10 +53,6 @@ class TestEvaluator(object):
     def test_TwoOperationsRespectingPrecedence(self):
         self.checkEvaluation("2+3*5", 17)
 
-<<<<<<< HEAD
-    def test_FloatingPointNumber(self):
-        self.checkEvaluation("1.5", 1.5, 0.01)
-=======
     def test_NegativeNumber(self):
         self.checkEvaluation("-3", -3)
 
@@ -73,7 +64,9 @@ class TestEvaluator(object):
 
     def test_AddNegativeNumberInParenetheses(self):
         self.checkEvaluation("2+(-3)", -1)
->>>>>>> chap5
+
+    def test_FloatingPointNumber(self):
+        self.checkEvaluation("1.5", 1.5, 0.01)
 
 class TestElementList(object):
     def test_FindOperationReturnsFirstOperation(self):
@@ -183,7 +176,6 @@ class TestOperand(object):
         sut = Operand(123)
         eq_(sut.value, 123)
 
-<<<<<<< HEAD
 class TestParser(object):
     def parse(self, s):
         sut = Parser(OperatorFactory(), OperandFactory())
@@ -191,15 +183,6 @@ class TestParser(object):
         
     def test_ParseReturnsAdditionElements(self):
         result = self.parse(("1+2"))
-=======
-class TestParser(object):    
-    def parse(self, s):
-        parser = Parser(OperatorFactory(), OperandFactory())
-        return list(parser.parse(s))
-        
-    def test_ParseReturnsAdditionElements(self):
-        result = self.parse("1+2")
->>>>>>> chap5
         assrt.eq_(len(result), 3)
         assrt.ok_(isinstance(result[0], Operand))
         assrt.ok_(isinstance(result[1], Operator))
@@ -222,12 +205,11 @@ class TestParser(object):
         assrt.ok_(isinstance(result[4], Operand))
         assrt.ok_(isinstance(result[5], Operator))
 
-<<<<<<< HEAD
     def test_FloatingPointNumber(self):
         result = self.parse("1.5")
         assrt.eq_(len(result), 1)
         eq_(result[0].value, 1.5, 0.01)
-=======
+
     def test_NegativeNumber(self):
         result = self.parse("-3")
         assrt.eq_(len(result), 2)
@@ -245,7 +227,19 @@ class TestParser(object):
         assrt.eq_(result[0].value, 1)
         assrt.eq_(result[1].precedence, 11)
         assrt.eq_(result[2].value, 2)
->>>>>>> chap5
+
+    @assrt.raises(Exception)
+    def test_TooManyOpenParentheses(self):
+        self.parse("(1")
+
+    @assrt.raises(Exception)
+    def test_TooManyCloseParentheses(self):
+        self.parse("1)")
+
+    @assrt.raises(ValueError)
+    def test_DoubleDecimalPoint(self):
+        self.parse("1.5.7")
+
 
 class TestOperatorFactory(object):
     def setUp(self):
@@ -313,12 +307,8 @@ class TestDivOperator(object):
     def test_DivOperatorComputesCorrectValue(self):
         sut = DivOperator()
         result = sut.compute(Operand(20), Operand(10))
-<<<<<<< HEAD
         eq_(result, 2)
-=======
-        assrt.eq_(result, 2)
 
     def test_TakesPrecedenceBoostIntoAccount(self):
         sut = DivOperator(7)
         assrt.eq_(sut.precedence, 9)
->>>>>>> chap5

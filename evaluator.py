@@ -43,13 +43,9 @@ class Parser(object):
             if curr_char.isdigit() or curr_char == '.':
                 operand += curr_char
             else:
-<<<<<<< HEAD
-                yield self.operand_factory.create(float(operand))
-=======
                 if operand != "":
-                    yield self.operand_factory.create(int(operand))
+                    yield self.operand_factory.create(float(operand))
 
->>>>>>> chap5
                 operand = ""
                 if curr_char == '(':
                     precedence_boost += Parser.BOOST
@@ -61,6 +57,12 @@ class Parser(object):
 
         if operand != "":
             yield self.operand_factory.create(float(operand))
+
+        if precedence_boost > 0:
+            raise Exception("Too many open parentheses")
+
+        if precedence_boost < 0:
+            raise Exception("Too many close parentheses")
 
 class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,
