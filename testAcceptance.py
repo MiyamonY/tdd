@@ -30,5 +30,11 @@ class TestAcceptance(object):
     def test_MultipleOperation(self):
         self.checkEvaluation("2+3*5-8/2", 13)
 
+<<<<<<< HEAD
     def test_ComplexExpressionWithFloatingPointNumbers(self):
         self.checkEvaluation("1.2*6/(2.74-9.1*(-5.27)/(3+17.4*(9.15-1.225)))", 0)
+=======
+    def test_ComplexExpression(self):
+        self.checkEvaluation("-2+3*(-5+8-9)/2", -11)
+
+>>>>>>> chap5

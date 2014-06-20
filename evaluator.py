@@ -29,20 +29,35 @@ class Evaluator(object):
 
 class Parser(object):
     ''' Parser class'''
+    BOOST = 10
     def __init__(self, operator_factory, operand_factory):
         self.operator_factory = operator_factory
         self.operand_factory = operand_factory
 
     def parse(self, s):
         '''parse string'''
+        precedence_boost = 0
+
         operand = ""
         for curr_char in s:
             if curr_char.isdigit() or curr_char == '.':
                 operand += curr_char
             else:
+<<<<<<< HEAD
                 yield self.operand_factory.create(float(operand))
+=======
+                if operand != "":
+                    yield self.operand_factory.create(int(operand))
+
+>>>>>>> chap5
                 operand = ""
-                yield self.operator_factory.create(curr_char)
+                if curr_char == '(':
+                    precedence_boost += Parser.BOOST
+                elif curr_char == ')':
+                    precedence_boost -= Parser.BOOST
+                else:
+                    yield \
+                        self.operator_factory.create(curr_char, precedence_boost)
 
         if operand != "":
             yield self.operand_factory.create(float(operand))
@@ -68,15 +83,22 @@ class ElementList(object):
 
         index = self.elements.index(first_op)
 
-        return Operation(self.elements[index-1],
+        return Operation(self.get_operand(index-1),
                          self.elements[index],
-                         self.elements[index+1])
+                         self.get_operand(index+1))
+
+    def get_operand(self, index):
+        return \
+            self.elements[index] if 0 <= index < len(self.elements) \
+            and isinstance(self.elements[index], Operand) else Operand(0)
 
     def replace_operation(self, operation, operand):
-        index = self.elements.index(operation.loperand)
-        del self.elements[index+2]
-        del self.elements[index+1]
+        index = self.elements.index(operation.op)
+        if self.get_operand(index+1) == operation.roperand:
+            del self.elements[index+1]
         self.elements[index] = operand
+        if self.get_operand(index-1) == operation.loperand:
+            del self.elements[index-1]
 
     def __getattr__(self, name):
         if name == 'first':
@@ -101,15 +123,15 @@ class Operand(Element):
         self.value = s
 
 class OperatorFactory(object):
-    def create(self, op):
+    def create(self, op, precedence_boost):
         if op == '+':
-            return AddOperator()
+            return AddOperator(precedence_boost)
         elif op == '-':
-            return SubOperator()
+            return SubOperator(precedence_boost)
         elif op == '*':
-            return MulOperator()
+            return MulOperator(precedence_boost)
         elif op == '/':
-            return DivOperator()
+            return DivOperator(precedence_boost)
         else:
             raise Exception("Unknown operator [{0}]".format(op))
 
@@ -126,36 +148,36 @@ class Operator(Element):
         raise NotImplementedError()
 
 class AddOperator(Operator):
-    def __init__(self):
+    def __init__(self, precedence_boost = 0):
         super(AddOperator, self).__init__('+')
-        self.precedence = 1
+        self.precedence = 1 + precedence_boost
 
     def compute(self, left, right):
         '''compute given value by add'''
         return left.value + right.value
 
 class SubOperator(Operator):
-    def __init__(self):
+    def __init__(self, precedence_boost = 0):
         super(SubOperator, self).__init__('-')
-        self.precedence = 1
+        self.precedence = 1 + precedence_boost
 
     def compute(self, left, right):
         '''compute given value by sub'''
         return left.value - right.value
 
 class MulOperator(Operator):
-    def __init__(self):
+    def __init__(self, precedence_boost = 0):
         super(MulOperator, self).__init__('*')
-        self.precedence = 2
+        self.precedence = 2 + precedence_boost
 
     def compute(self, left, right):
         '''comptue given value by multi'''
         return left.value * right.value
 
 class DivOperator(Operator):
-    def __init__(self):
+    def __init__(self, precedence_boost = 0):
         super(DivOperator, self).__init__('/')
-        self.precedence = 2
+        self.precedence = 2 + precedence_boost
 
     def compute(self, left, right):
         return left.value / right.value
