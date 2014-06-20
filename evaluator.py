@@ -30,9 +30,10 @@ class Evaluator(object):
 class Parser(object):
     ''' Parser class'''
     BOOST = 10
-    def __init__(self, operator_factory, operand_factory):
+    def __init__(self, operator_factory, operand_factory, symbols=None):
         self.operator_factory = operator_factory
         self.operand_factory = operand_factory
+        self.symbols = symbols
 
     def parse(self, s):
         '''parse string'''
@@ -42,11 +43,11 @@ class Parser(object):
         for curr_char in s:
             if curr_char.isspace(): continue
 
-            if curr_char.isdigit() or curr_char == '.':
+            if curr_char.isalnum() or curr_char == '.':
                 operand += curr_char
             else:
                 if operand != "":
-                    yield self.operand_factory.create(float(operand))
+                    yield self.operand_factory.create(self.get_operand(operand))
 
                 operand = ""
                 if curr_char == '(':
@@ -58,13 +59,16 @@ class Parser(object):
                         self.operator_factory.create(curr_char, precedence_boost)
 
         if operand != "":
-            yield self.operand_factory.create(float(operand))
+            yield self.operand_factory.create(self.get_operand(operand))
 
         if precedence_boost > 0:
             raise Exception("Too many open parentheses")
 
         if precedence_boost < 0:
             raise Exception("Too many close parentheses")
+
+    def get_operand(self, operand):
+        return self.symbols[operand] if operand[0].isalpha() else float(operand)
 
 class Element(object):
     '''Operand, Operator's base class(using dynamic typing language,

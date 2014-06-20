@@ -10,8 +10,8 @@ def ok_(result, expected, precision):
 
 class TestAcceptance(object):
 
-    def checkEvaluation(self, s, expected, precision=0.00):
-        parser = Parser(OperatorFactory(), OperandFactory())
+    def checkEvaluation(self, s, expected, precision=0.00, symbols = None):
+        parser = Parser(OperatorFactory(), OperandFactory(), symbols)
         sut = Evaluator(parser)
         result = sut.eval(s)
         ok_(result, expected, precision)
@@ -36,3 +36,7 @@ class TestAcceptance(object):
 
     def test_ComplexExpression(self):
         self.checkEvaluation("-2+3*(-5+8-9)/2", -11)
+
+    def test_test_ExpressionWithSymbols(self):
+        self.checkEvaluation("(x + 3) / (y + 5)", 2, 0.01, {"x": 7, "y": 0})
+

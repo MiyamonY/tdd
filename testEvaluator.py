@@ -244,6 +244,12 @@ class TestParser(object):
         result = self.parse("1 + 2")
         assrt.eq_(len(result), 3)
 
+    def test_SymbolExpression(self):
+        sut = Parser(OperatorFactory(), OperandFactory(), {"x": 10})
+        result = list(sut.parse("x"))
+        assrt.eq_(len(result), 1)
+        assrt.eq_(result[0].value, 10)
+
 class TestOperatorFactory(object):
     def setUp(self):
         self.sut = OperatorFactory()
